@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rolagem de Dados - Vampiro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Imagem -->
+        <img src="static/img/logo_white.svg" alt="Logo Vampiro" width="270px">
+
+        <!-- Título -->
+        <h1 class="titulo">Rolagem de Dados - Vampiro</h1>
+
+        <!-- Formulário -->
+        <form id="dice-form">
+            <div class="form-group">
+                <label for="dados">Quantidade Total de Dados:</label>
+                <input type="number" id="dados" name="dados" min="1" value="1" required placeholder="Ex.: 5">
+            </div>
+            <div class="form-group">
+                <label for="fome">Quantidade de Dados de Fome:</label>
+                <input type="number" id="fome" name="fome" min="0" max="5" value="0" required placeholder="Máximo 5">
+            </div>
+            <div class="form-group">
+                <label for="dificuldade">Dificuldade:</label>
+                <input type="number" id="dificuldade" name="dificuldade" min="1" value="3" required placeholder="Ex.: 3">
+            </div>
+            <button type="button" onclick="rollDice()">Rolar Dados</button>
+        </form>
+
+        <!-- Contêiner dos Dados -->
+        <div class="dice-container" id="dice-container"></div>
+
+        <!-- Resultados -->
+        <div class="results" id="results"></div>
+    </div>
+    
+
+    <script>
+        const diceContainer = document.getElementById("dice-container");
+        const resultsDiv = document.getElementById("results");
+    
+        const diceResults = {
+            normal: {
+                1: "static/img/normal-fail.png",
+                2: "static/img/normal-fail.png",
+                3: "static/img/normal-fail.png",
+                4: "static/img/normal-fail.png",
+                5: "static/img/normal-fail.png",
+                6: "static/img/normal-success.png",
+                7: "static/img/normal-success.png",
+                8: "static/img/normal-success.png",
+                9: "static/img/normal-success.png",
+                10: "static/img/normal-crit.png"
+            },
+            fome: {
+                1: "static/img/bestial-fail.png",
+                2: "static/img/red-fail.png",
+                3: "static/img/red-fail.png",
+                4: "static/img/red-fail.png",
+                5: "static/img/red-fail.png",
+                6: "static/img/red-success.png",
+                7: "static/img/red-success.png",
+                8: "static/img/red-success.png",
+                9: "static/img/red-success.png",
+                10: "static/img/red-crit.png'"
+            }
+        };
+    
+        function criarDado(tipo, valor) {
+            const dice = document.createElement("div");
+            dice.classList.add("dice", tipo);
+    
+            const diceResult = document.createElement("div");
+            diceResult.classList.add("dice-result");
+            diceResult.style.backgroundImage = `url(${diceResults[tipo][valor]})`;
+    
+            dice.appendChild(diceResult);
+            diceContainer.appendChild(dice);
+    
+            setTimeout(() => {
+                dice.style.animation = "none"; // Para a animação
+                diceResult.style.display = "block"; // Mostra o resultado no centro
+            }, 1000);
+    
+            return valor;
+        }
+    
+        function typeWriterEffect(elementId, text, delay = 50) {
+            const element = document.getElementById(elementId);
+            element.textContent = ""; // Limpa o conteúdo inicial
+    
+            let index = 0;
+    
+            function type() {
+                if (index < text.length) {
+                    element.textContent += text[index];
+                    index++;
+                    setTimeout(type, delay); // Adiciona o próximo caractere após um atraso
+                }
+            }
+    
+            type();
+        }
+    
+        function rollDice() {
+            const totalDados = parseInt(document.getElementById("dados").value) || 0;
+            const dadosFome = parseInt(document.getElementById("fome").value) || 0;
+            const dificuldade = parseInt(document.getElementById("dificuldade").value) || 0;
+    
+            if (dadosFome > totalDados) {
+                alert("Os dados de fome não podem exceder o total de dados.");
+                return;
+            }
+    
+            diceContainer.innerHTML = ""; // Limpa os dados anteriores
+            resultsDiv.style.opacity = "0"; // Esconde os resultados inicialmente
+    
+            const resultados = [];
+            const resultadosFome = [];
+            let sucessos = 0;
+            let criticos = 0;
+            let falhasBestiais = 0;
+    
+            // Rolagem de dados normais
+            for (let i = 0; i < totalDados - dadosFome; i++) {
+                const roll = Math.floor(Math.random() * 10) + 1;
+                criarDado("normal", roll);
+                resultados.push(roll);
+                if (roll >= 6 && roll < 10) sucessos++;
+                if (roll === 10) criticos++;
+            }
+    
+            // Rolagem de dados de fome
+            for (let i = 0; i < dadosFome; i++) {
+                const roll = Math.floor(Math.random() * 10) + 1;
+                criarDado("fome", roll);
+                resultadosFome.push(roll);
+                if (roll >= 6 && roll < 10) sucessos++;
+                if (roll === 10) criticos++;
+                if (roll === 1) falhasBestiais++;
+            }
+    
+            // Calcular sucessos críticos
+            const paresCriticos = Math.floor(criticos / 2);
+            const sucessosCriticos = paresCriticos * 4;
+            sucessos += sucessosCriticos;
+
+            const mensagemFinal = sucessos >= dificuldade
+                ? `<span class="success">Você atingiu a dificuldade, filha da puta!</span>`
+                : `<span class="failure">Você não atingiu a dificuldade, esterco!</span>`;
+    
+            // Exibir resultados após 2 segundos
+            setTimeout(() => {
+                const text = `
+    Total de Dados Rolados: ${totalDados}
+    Dados Normais: ${resultados.join(", ")}
+    Dados de Fome: ${resultadosFome.join(", ")}
+    Sucessos: ${sucessos}
+    Sucessos Críticos: ${sucessosCriticos} (Pares de 10)
+    Falhas Bestiais: ${falhasBestiais}
+    ${sucessos >= dificuldade ? "Você atingiu a dificuldade, filha da puta!" : "Você não atingiu a dificuldade, esterco!."}
+                `;
+                typeWriterEffect("results", text.trim(), 10);
+                resultsDiv.style.opacity = "1"; // Mostra os resultados após a digitação
+            }, 2000);
+        }
+    </script>
+    
+</body>
+</html>
