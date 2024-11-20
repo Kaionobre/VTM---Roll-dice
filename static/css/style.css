@@ -41,14 +41,6 @@ form {
 .typewriter-effect {
     font-family: 'Courier New', Courier, monospace;
 }
-.container {
-    text-align: center;
-    background-color: #2c2c2c;
-    padding: 20px;
-    border: 3px solid #900;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #900;
-}
 
 label {
     font-size: 1.2rem;
@@ -103,8 +95,8 @@ button:hover {
 
 .dice {
     position: relative;
-    width: 100px;
-    height: 100px;
+    width: 123px;
+    height: 123px;
     background-size: cover;
     background-position: center;
     animation: spin 1s linear infinite;
@@ -113,23 +105,28 @@ button:hover {
     align-items: center;
 }
 .dice.normal {
-    background-image: url("static/img/dado-10-lados-preto.png");
+    background-image: url("/static/img/dado-10-lados-preto.png");
 }
 .dice.fome {
-    background-image: url("static/img/dado-10-lados.png");
+    background-image: url("/static/img/dado-10-lados.png");
 }
+
 .dice-result {
     position: absolute;
-    width: 50px;
-    height: 50px;
-    background-size: cover;
+
+    width: 50px; /* Reduzido de 50px */
+    height: 50px; /* Reduzido de 50px */
+    background-size: contain; /* Garante que a imagem fique contida e proporcional */
+    background-repeat: no-repeat; /* Evita repetições */
     background-position: center;
     display: none;
 }
+
 @keyframes spin {
     0% { transform: rotate(0); }
     100% { transform: rotate(360deg); }
 }
+
 .results {
     margin-top: 20px;
     background-color: #2c2c2c;
@@ -139,13 +136,39 @@ button:hover {
     color: white;
     text-align: left;
     max-width: 500px;
-    white-space: pre-wrap; /* Suporte a quebras de linha */
     font-family: 'Courier New', Courier, monospace;
-    overflow: hidden; /* Efeito de máquina de escrever */
-    border-right: 2px solid white; /* Cursor */
-    animation: blink 0.7s steps(2, start) infinite;
 }
+
+.message {
+    padding: 10px;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: 3px solid #900;
+    border-radius: 5px;
+    background-color: #2c2c2c;
+    box-shadow: 0 0 10px #900;
+}
+
+
+.success {
+    color: #00ff00; /* Verde para sucesso */
+    text-shadow: rgb(28, 70, 3);
+    font-weight: bold;
+}
+
+.failure {
+    color: #ff0000; /* Vermelho para falha */
+    text-shadow: #900;
+    font-weight: bold;
+}
+
 @keyframes blink {
-    from { border-right-color: white; }
-    to { border-right-color: transparent; }
+    from {
+        border-right-color: white;
+    }
+    to {
+        border-right-color: transparent;
+    }
 }
